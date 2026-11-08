@@ -11,8 +11,10 @@ parcial-2-elixir/
 ├── README.md
 ├── punto-1/
 │   ├── main.exs          # punto de entrada
+│   ├── archivo.exs       # lectura genérica de archivos con parser por línea
+│   ├── persistencia.exs  # rutas y acceso a los archivos del punto 1
 │   ├── registros.exs     # structs Ciudad y MovimientoSismico, parseo y validación de una línea
-│   ├── carga.exs         # lectura concurrente (Task.async / Task.await) y cruce de catálogos
+│   ├── carga.exs         # coordinación concurrente con spawn/send/receive y cruce de catálogos
 │   ├── calculo.exs       # estadísticas por ciudad (un solo recorrido recursivo)
 │   ├── reporte.exs       # formato del reporte, guardado y orquestación
 │   └── resources/
@@ -23,7 +25,9 @@ parcial-2-elixir/
     │   └── cliente.exs
     └── nodo-servidor/
         ├── servidor.exs
-        ├── registros.exs     # copias de los módulos del punto 1
+        ├── archivo.exs       # copias de los módulos del punto 1
+        ├── persistencia.exs
+        ├── registros.exs
         ├── carga.exs
         ├── calculo.exs
         ├── reporte.exs
@@ -117,9 +121,9 @@ Con el servidor aún en ejecución en la Terminal 1, ejecute el mismo comando de
 
 ## Decisiones de diseño
 
-- La lectura concurrente de los dos archivos usa `Task.async` y `Task.await`; el coordinador inicia ambos `Task` antes de esperar sus resultados.
+- La lectura concurrente de los dos archivos usa `spawn`, `send` y `receive`; el coordinador inicia ambos trabajadores antes de esperar sus resultados y los recibe en cualquier orden.
 - Las estadísticas por ciudad (cantidad, mayor magnitud y suma de profundidades) se calculan con una única recursión explícita sobre los movimientos.
-- Responsabilidades separadas: `registros.exs` (parseo y validación), `carga.exs` (lectura y cruce), `calculo.exs` (estadísticas), `reporte.exs` (formato y guardado).
+- Responsabilidades separadas: `archivo.exs` (lectura genérica con parser), `persistencia.exs` (rutas y acceso a archivos), `registros.exs` (parseo y validación), `carga.exs` (coordinación de procesos y cruce), `calculo.exs` (estadísticas) y `reporte.exs` (formato y guardado).
 
 ## Reflexión sobre el uso de inteligencia artificial
 

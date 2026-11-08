@@ -56,8 +56,8 @@ defmodule Calculo do
   defp mayor_entre(nil, %{codigo: codigo, magnitud: magnitud}), do: {codigo, magnitud}
 
   defp mayor_entre({_codigo, mayor}, %{codigo: codigo, magnitud: magnitud})
-       when magnitud > mayor,
-       do: {codigo, magnitud}
+      when magnitud > mayor,
+      do: {codigo, magnitud}
 
   defp mayor_entre(actual, _movimiento), do: actual
 
