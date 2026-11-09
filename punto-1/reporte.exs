@@ -33,7 +33,7 @@ defmodule Observatorio do
 
   # ---------- Formato del reporte ----------
 
-  defp formatear_reporte(resumenes, rechazados) do
+  def formatear_reporte(resumenes, rechazados) do
     lineas =
       [
         "============================================================",
@@ -47,7 +47,7 @@ defmodule Observatorio do
     Enum.join(lineas, "\n")
   end
 
-  defp formatear_ciudad(resumen) do
+  def formatear_ciudad(resumen) do
     ciudad = resumen.ciudad
 
     [

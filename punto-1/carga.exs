@@ -88,7 +88,7 @@ defmodule Coordinador do
 
   # ---------- Consolidación ----------
 
-  defp clasificar_resultados(resultados) do
+  def clasificar_resultados(resultados) do
     fallos =
       for archivo <- [:ciudades, :movimientos],
           {ruta, {:error, razon}} <- [Map.fetch!(resultados, archivo)],
