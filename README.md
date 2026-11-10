@@ -2,6 +2,8 @@
 
 Universidad del Quindío · Ingeniería de Sistemas y Computación
 
+Samuel Franco Salazar - Julian Andres Ladino Nossa
+
 Aplicación en Elixir que genera un reporte de sismos por ciudad (Punto 1) y permite consultarlo desde otro nodo (Punto 2).
 
 ## Estructura del repositorio
@@ -11,7 +13,7 @@ parcial-2-elixir/
 ├── README.md
 ├── punto-1/
 │   ├── main.exs          # punto de entrada
-│   ├── archivo.exs       # lectura genérica de archivos con parser por línea
+│   ├── txt.exs       # lectura genérica de archivos con parser por línea
 │   ├── persistencia.exs  # rutas y acceso a los archivos del punto 1
 │   ├── registros.exs     # structs Ciudad y MovimientoSismico, parseo y validación de una línea
 │   ├── carga.exs         # coordinación concurrente con spawn/send/receive y cruce de catálogos
@@ -19,13 +21,14 @@ parcial-2-elixir/
 │   ├── reporte.exs       # formato del reporte, guardado y orquestación
 │   └── resources/
 │       ├── ciudades.txt
-│       └── movimientos.txt   # (reporte_sismos.txt se genera aquí)
+│       ├── movimientos.txt   
+│        └── reporte_sismos.txt
 └── punto-2/
     ├── nodo-cliente/
     │   └── cliente.exs
     └── nodo-servidor/
         ├── servidor.exs
-        ├── archivo.exs       # copias de los módulos del punto 1
+        ├── txt.exs       # copias de los módulos del punto 1
         ├── persistencia.exs
         ├── registros.exs
         ├── carga.exs
@@ -36,7 +39,7 @@ parcial-2-elixir/
             └── movimientos.txt
 ```
 
-Requisito: Elixir instalado (`elixir --version`). Cada comando indica la carpeta desde la que se ejecuta.
+Requisito: Elixir instalado (`elixir --version`) probado con Elixir 1.20.3. Cada comando indica la carpeta desde la que se ejecuta.
 
 ## Datos de prueba
 
@@ -123,13 +126,14 @@ Con el servidor aún en ejecución en la Terminal 1, ejecute el mismo comando de
 
 - La lectura concurrente de los dos archivos usa `spawn`, `send` y `receive`; el coordinador inicia ambos trabajadores antes de esperar sus resultados y los recibe en cualquier orden.
 - Las estadísticas por ciudad (cantidad, mayor magnitud y suma de profundidades) se calculan con una única recursión explícita sobre los movimientos.
-- Responsabilidades separadas: `archivo.exs` (lectura genérica con parser), `persistencia.exs` (rutas y acceso a archivos), `registros.exs` (parseo y validación), `carga.exs` (coordinación de procesos y cruce), `calculo.exs` (estadísticas) y `reporte.exs` (formato y guardado).
+- Responsabilidades separadas: `txt.exs` (lectura genérica con parser), `persistencia.exs` (rutas y acceso a archivos), `registros.exs` (parseo y validación), `carga.exs` (coordinación de procesos y cruce), `calculo.exs` (estadísticas) y `reporte.exs` (formato y guardado).
 
 ## Reflexión sobre el uso de inteligencia artificial
 
+**1. Herramientas y agentes.** Usamos Claude para: La validación de una línea de cada archivo, la lectura concurrente con `Task`, el formato del reporte, el servidor y el cliente del Punto 2, la estructura del repositorio y la revisión final del repo.
 
+**2. Caso decisivo.** Al correr el Punto 2 teníamos errores y le pedimos ayuda a Claude con capturas de VS Code. Detectó que en `nodo-servidor` faltaban `txt.exs` y `persistencia.exs`, de los que depende `carga.exs`, y que `resources/movimientos.txt` del servidor estaba vacío. También indicó que `servidor.exs` necesitaba dos funciones públicas (`clasificar_resultados` en `carga.exs` y `formatear_ciudad`/`formatear_reporte` en `reporte.exs`) y que cada copia de los módulos en `nodo-servidor` debía actualizarse. Lo verificamos copiando los archivos y ejecutando servidor y cliente en dos terminales: el cliente mostró las cuatro respuestas y la confirmación `:fin`.
 
-1. **Herramientas y agentes:** _qué asistentes se usaron y en qué tareas._
-2. **Caso decisivo:** _una interacción concreta, la respuesta obtenida y cómo se verificó o adaptó._
-3. **Idea diferente de la clase:** _una sugerencia distinta de las vistas en clase, su aporte, si se implementó y lo aprendido._
-4. **Conclusiones:** _qué se comprende por sí solos, qué cuesta todavía y qué se cambiaría en un siguiente proyecto._
+**3. Idea diferente de la clase.** Claude propuso que se reutilizara la lógica del Punto 1 en vez de duplicarla: el `Coordinador.clasificar_resultados` valida y cruza los resultados, igual que en el reporte local.
+
+**4. Conclusiones.** Las partes más difíciles fueron: (a) el recorrido recursivo único que calcula cantidad, mayor magnitud (conservando el primero en empates) y suma de profundidades; (b) la coordinación concurrente, que solo genera el reporte si ambos archivos se leen bien y, si no, conserva el reporte anterior; (c) la comunicación entre nodos: proceso registrado, `receive` recursivo, respuestas en orden y cookie compartida. [Completar con lo que cada uno entiende bien, lo que todavía cuesta y qué cambiarían en un siguiente proyecto.]
